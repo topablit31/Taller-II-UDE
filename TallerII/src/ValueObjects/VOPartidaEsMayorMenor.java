@@ -6,7 +6,7 @@ public class VOPartidaEsMayorMenor
 	private boolean finalizada;
 	private int cantIntentos;
 	private int puntajeFinal;
-	String mensaje;
+	private String mensaje;
 	
 	public VOPartidaEsMayorMenor (int num, boolean fin, int cantIn, int punt, String msg)
 	{

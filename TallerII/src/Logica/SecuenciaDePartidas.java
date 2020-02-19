@@ -3,6 +3,8 @@ package Logica;
 
 import java.util.*;
 
+import ValueObjects.VOPartida;
+
 public class SecuenciaDePartidas
 {
 
@@ -64,6 +66,12 @@ public class SecuenciaDePartidas
 		int numPartidas = partidas.size();
 		return numPartidas-1;
 	}
+
+	public Iterator<Partida> devolverIteratorPartida() {
+		return partidas.iterator();
+	}
+
+	
 	
 	
 	

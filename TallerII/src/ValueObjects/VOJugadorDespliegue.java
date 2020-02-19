@@ -1,47 +1,38 @@
 package ValueObjects;
 
-public class VOJugadorDespliegue 
-{
+public class VOJugadorDespliegue {
+
+	
 	private String nombre;
-	private String codIngreso;
 	private int puntajeTotal;
 	private int cantPartidasFinalizadas;
 	private int cociente;
 	
-	public VOJugadorDespliegue (String nom, String cod, int punt, int cantPart, int coc)
-	{
-		nombre = nom;
-		codIngreso = cod;
-		puntajeTotal = punt;
-		cantPartidasFinalizadas = cantPart;
-		cociente = coc;
+	public VOJugadorDespliegue(String nombre, int puntajeTotal, int cantPartidasFinalizadas,
+			int cociente) {
+
+		this.nombre = nombre;
+		this.puntajeTotal = puntajeTotal;
+		this.cantPartidasFinalizadas = cantPartidasFinalizadas;
+		this.cociente = cociente;
 	}
+
 	
-	public String getVONombre() 
-	{
+	public String getNombre() {
 		return nombre;
 	}
-	
-	public String getVOCodIngreso() 
-	{
-		return codIngreso;
-	}
-	
-	public int getVOPuntajeTotal() 
-	{
+
+	public int getPuntajeTotal() {
 		return puntajeTotal;
 	}
-	
-	public int getVOCantPartidasFinalizadas() 
-	{
+
+	public int getCantPartidasFinalizadas() {
 		return cantPartidasFinalizadas;
 	}
-	
-	public int getVOCociente() 
-	{
+
+	public int getCociente() {
 		return cociente;
 	}
 	
 	
-
 }

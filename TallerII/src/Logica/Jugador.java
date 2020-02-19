@@ -143,4 +143,6 @@ public class Jugador
 		cantPartidasFinalizadas++;
 	}
 
+	
+
 }
