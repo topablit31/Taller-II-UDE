@@ -46,7 +46,7 @@ public class SecuenciaDePartidas
 	}
 	
 	//Retorna y ELIMINA la ultima partida de la secuencia
-	public Partida	RetornarYEliminarUltimaPartidaDeLaLista ()
+	/*public Partida	RetornarYEliminarUltimaPartidaDeLaLista ()
 	{
 		int cantPartidas = partidas.size();
 		if (cantPartidas > 0)
@@ -58,7 +58,7 @@ public class SecuenciaDePartidas
 		{
 			return null; // Exception
 		}
-	}
+	} */
 
 	//Retorna el numero de la ultima partida
 	public int RetornarNumeroPartidaMasAlta()

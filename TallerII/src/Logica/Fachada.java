@@ -188,7 +188,6 @@ public class Fachada {
 				int numP = part.getNumPartida();
 				part.sumarUnIntento();
 				int cantInt = part.getCantIntentos();
-
 				int numS = part.getNumSecreto();
 				
 				if (posibleNumSecreto < numS) {
@@ -204,8 +203,7 @@ public class Fachada {
 						partAMostrar = new VOPartidaEsMayorMenor(numP, false, cantInt, 0, message);
 
 					} else {
-						sec = player.getPartidas();
-
+		
 						int puntFinal = (int) Math.ceil(1000 / cantInt);
 						part.setPuntajeFinal(puntFinal);
 
@@ -213,11 +211,11 @@ public class Fachada {
 						partAMostrar = new VOPartidaEsMayorMenor(numP, true, cantInt, puntFinal, message);
 
 						player.SumarUnaPartidaFinalizada();
-						int puntFinalJugador = player.getPuntajeTotal() + puntFinal;
+						int puntActualJugador = player.getPuntajeTotal() + puntFinal;
 						int cantPartidas = player.getCantPartidasFinalizadas();
-						int nuevoCociente = (int) Math.ceil(puntFinalJugador / cantPartidas);
+						int nuevoCociente = (int) Math.ceil(puntActualJugador / cantPartidas);
 						player.setPartidaEnCurso(false);
-						player.setPuntajeTotal(puntFinalJugador);
+						player.setPuntajeTotal(puntActualJugador);
 						player.setCociente(nuevoCociente);
 
 					}
@@ -232,20 +230,17 @@ public class Fachada {
 
 	// Retorna el abandono de la partida en curso del Jugador
 	public VOPartidaEsMayorMenor abandonarPartida(VOJugadorLogin jug) {
-		String nom = jug.getNombre();
-		String cod = jug.getCodIngreso();
-		boolean existe = jugadores.member(nom);
-		if (!existe) {
-			/* Exception */
+		
+		if (logearseParaJugar(jug)) {
+			throw new UnsupportedOperationException();
 		} else {
-			Jugador player = jugadores.find(nom);
+			Jugador player = jugadores.find(jug.getNombre());
 			boolean tieneEnCurso = player.isPartidaEnCurso();
 			if (!tieneEnCurso) {
-				// Expception
+				throw new UnsupportedOperationException();
 			} else {
-				SecuenciaDePartidas sec = new SecuenciaDePartidas();
-				sec = player.getPartidas();
-				Partida part = sec.RetornarYEliminarUltimaPartidaDeLaLista();
+				SecuenciaDePartidas sec = player.getPartidas();
+				Partida part = sec.RetornarUltimaPartida();
 
 				part.sumarUnIntento();
 				int cantIn = part.getCantIntentos();
@@ -253,19 +248,16 @@ public class Fachada {
 				int numP = part.getNumPartida();
 				part.setPuntajeFinal(puntFinal);
 				part.setFinalizada(true);
-				sec.InsBack(part);
-				player.setPartidas(sec);
 				String message = "Ha abandonado la partida";
 				VOPartidaEsMayorMenor partAMostrar = new VOPartidaEsMayorMenor(numP, true, cantIn, puntFinal, message);
 
 				player.SumarUnaPartidaFinalizada();
-				int puntFinalJugador = player.getPuntajeTotal();
+				int puntActualJugador = player.getPuntajeTotal()+ puntFinal;
 				int cantPartidas = player.getCantPartidasFinalizadas();
-				int nuevoCociente = (int) Math.ceil(puntFinalJugador / cantPartidas);
+				int nuevoCociente = (int) Math.ceil(puntActualJugador / cantPartidas);
 				player.setPartidaEnCurso(false);
-				player.setPuntajeTotal(puntFinalJugador);
+				player.setPuntajeTotal(puntActualJugador);
 				player.setCociente(nuevoCociente);
-				jugadores.ActualizarJugador(nom, player);
 
 				return partAMostrar;
 			}
@@ -279,7 +271,7 @@ public class Fachada {
 		boolean vacio = jugadores.empty();
 		ArrayList<VOJugadorDespliegue> jugadoresAMostrar = new ArrayList<VOJugadorDespliegue>();
 		if (vacio) {
-			/* Excepcion */
+			throw new UnsupportedOperationException();
 		} else {
 			LinkedList<Jugador> iter = new LinkedList<Jugador>();
 			iter = jugadores.Iterador();

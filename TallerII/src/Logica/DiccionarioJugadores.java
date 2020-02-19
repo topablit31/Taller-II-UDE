@@ -48,10 +48,10 @@ public class DiccionarioJugadores
 	}
 	*/
 	//Actualiza el jugador en el Diccionario
-	public void ActualizarJugador (String cod,Jugador jug)
+	/*public void ActualizarJugador (String cod,Jugador jug)
 	{
 		jugadores.replace(cod, jug);
-	}
+	}*/
 	
 	
 }
