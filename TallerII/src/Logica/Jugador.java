@@ -1,7 +1,8 @@
 package Logica;
 
+import java.util.Iterator;
 
-public class Jugador 
+public class Jugador implements Comparable<Jugador>
 {
 	private String nombre;
 	private String codIngreso;
@@ -142,7 +143,12 @@ public class Jugador
 	{
 		cantPartidasFinalizadas++;
 	}
+	@Override
+	public int compareTo(Jugador jugador) {
+		
+		return this.puntajeTotal-jugador.getPuntajeTotal();
+	}
 
-	
+
 
 }

@@ -7,6 +7,7 @@ import org.omg.CORBA.portable.ApplicationException;
 import Logica.DiccionarioJugadores;
 import ValueObjects.VOJugadorDespliegue;
 import ValueObjects.VOJugadorLogin;
+import ValueObjects.VOJugadorRankingGlobal;
 import ValueObjects.VOPartida;
 import ValueObjects.VOPartidaEsMayorMenor;
 
@@ -189,7 +190,7 @@ public class Fachada {
 				part.sumarUnIntento();
 				int cantInt = part.getCantIntentos();
 				int numS = part.getNumSecreto();
-				
+
 				if (posibleNumSecreto < numS) {
 
 					message = "El numero secreto es menor al numero ingresado";
@@ -203,7 +204,7 @@ public class Fachada {
 						partAMostrar = new VOPartidaEsMayorMenor(numP, false, cantInt, 0, message);
 
 					} else {
-		
+
 						int puntFinal = (int) Math.ceil(1000 / cantInt);
 						part.setPuntajeFinal(puntFinal);
 
@@ -220,17 +221,19 @@ public class Fachada {
 
 					}
 
-					return partAMostrar;
+					
 				}
+				return partAMostrar;
 			}
 		} else {
 			throw new UnsupportedOperationException();
 		}
+		
 	}
 
 	// Retorna el abandono de la partida en curso del Jugador
 	public VOPartidaEsMayorMenor abandonarPartida(VOJugadorLogin jug) {
-		
+
 		if (logearseParaJugar(jug)) {
 			throw new UnsupportedOperationException();
 		} else {
@@ -252,7 +255,7 @@ public class Fachada {
 				VOPartidaEsMayorMenor partAMostrar = new VOPartidaEsMayorMenor(numP, true, cantIn, puntFinal, message);
 
 				player.SumarUnaPartidaFinalizada();
-				int puntActualJugador = player.getPuntajeTotal()+ puntFinal;
+				int puntActualJugador = player.getPuntajeTotal() + puntFinal;
 				int cantPartidas = player.getCantPartidasFinalizadas();
 				int nuevoCociente = (int) Math.ceil(puntActualJugador / cantPartidas);
 				player.setPartidaEnCurso(false);
@@ -269,14 +272,20 @@ public class Fachada {
 	// cociente
 	public ArrayList<VOJugadorRankingGlobal> rankingGlobal() {
 		boolean vacio = jugadores.empty();
-		ArrayList<VOJugadorDespliegue> jugadoresAMostrar = new ArrayList<VOJugadorDespliegue>();
-		if (vacio) {
-			throw new UnsupportedOperationException();
-		} else {
-			LinkedList<Jugador> iter = new LinkedList<Jugador>();
-			iter = jugadores.Iterador();
-			// Aca hay que ordenar el Iterador por cociente... Te lo deje divino fosil
+		Iterator<Jugador> iterator = jugadores.devolverIteradorJugador();
+		ArrayList<VOJugadorRankingGlobal> lista = new ArrayList<VOJugadorRankingGlobal>();
+		int i = 1;
+		while (iterator.hasNext()) {
+			Jugador jugador = iterator.next();
+			String nombre = jugador.getNombre();
+			int puntaje = jugador.getPuntajeTotal();
+			int cantidad = jugador.getCantPartidasFinalizadas();
+			int cociente = jugador.getCociente();
+			VOJugadorRankingGlobal VOJugador = new VOJugadorRankingGlobal(i, nombre, puntaje, cantidad, cociente);
+			lista.add(VOJugador);
+			i++;
 		}
+		return lista;
 	}
 
 	// Monitor, clasificar requerimientos lectura ó escritura, si modifica datos
