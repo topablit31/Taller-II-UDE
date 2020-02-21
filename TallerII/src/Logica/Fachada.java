@@ -10,6 +10,8 @@ import ValueObjects.VOJugadorLogin;
 import ValueObjects.VOJugadorRankingGlobal;
 import ValueObjects.VOPartida;
 import ValueObjects.VOPartidaEsMayorMenor;
+import Logica.JugadorException;
+import Logica.PartidaException;
 
 /*import ValueObjects.VOJugadorLogin;*/
 
@@ -23,24 +25,24 @@ public class Fachada {
 	}
 
 	// Registra un nuevo jugador en el Diccionario
-	public void registrarNuevoJugador(VOJugadorLogin voJugador) {
+	public void registrarNuevoJugador(VOJugadorLogin voJugador) throws JugadorException {
 		String nombre = voJugador.getNombre();
 		String codigoIngreso = voJugador.getCodIngreso();
 		if (!jugadores.member(nombre)) {
 			Jugador jugador = new Jugador(nombre, codigoIngreso);
 			jugadores.insert(nombre, jugador);
 		} else {
-			throw new UnsupportedOperationException();
+			throw new JugadorException(4);
 		}
 	}
 
 	// Retorna un ArrayList con los Jugadores que estan en el Diccionario, ordenados
 	// alfabeticamente
-	public ArrayList<VOJugadorDespliegue> listarJugadores() {
+	public ArrayList<VOJugadorDespliegue> listarJugadores() throws JugadorException {
 		boolean vacio = jugadores.empty();
 		ArrayList<VOJugadorDespliegue> jugadoresAMostrar = new ArrayList<VOJugadorDespliegue>();
 		if (vacio) {
-			throw new UnsupportedOperationException();
+			throw new JugadorException(2);
 		} else {
 			Iterator<Jugador> iter = jugadores.devolverIteradorJugador();
 
@@ -63,13 +65,13 @@ public class Fachada {
 
 	// Retorna un ArrayList con las partidas de un jugador, ordenadas de menor a
 	// mayor numero de Partida
-	public ArrayList<VOPartida> listarPartidasDeUnJugador(String nom) {
+	public ArrayList<VOPartida> listarPartidasDeUnJugador(String nom) throws JugadorException, PartidaException {
 		// ArrayList<VOJugadorDespliegue> jugadoresAMostrar = new
 		// ArrayList<VOJugadorDespliegue>();
 		ArrayList<VOPartida> partidasAMostrar = new ArrayList<VOPartida>();
 		boolean existe = jugadores.member(nom);
 		if (!existe) {
-			throw new UnsupportedOperationException();
+			throw new JugadorException(3);
 		} else {
 			Jugador jug = jugadores.find(nom);
 			SecuenciaDePartidas sec = jug.getPartidas();
@@ -77,7 +79,7 @@ public class Fachada {
 
 			boolean vacia = sec.esVacia();
 			if (vacia) {
-				throw new UnsupportedOperationException();
+				throw new PartidaException();
 			} else {
 				Iterator<Partida> iterator = sec.devolverIteratorPartida();
 				int i = 1;
@@ -103,19 +105,18 @@ public class Fachada {
 	}
 
 	// Verifica que el nombre y el codigo de Ingreso sean validos
-	public boolean logearseParaJugar(VOJugadorLogin jug) {
+	public boolean logearseParaJugar(VOJugadorLogin jug) throws JugadorException {
 		String nom = jug.getNombre();
 		String cod = jug.getCodIngreso();
 		boolean existe = jugadores.member(nom);
 		if (!existe) {
-			return false;
-			/* Exception */
+			throw new JugadorException(3);
+
 		} else {
 			Jugador player = jugadores.find(nom);
 
 			if (!player.validarCodigoIngreso(cod)) {
-				/* Exception */
-				return false;
+				throw new JugadorException(1);
 			} else {
 				return true;
 			}
@@ -123,11 +124,11 @@ public class Fachada {
 	}
 
 	// Inicia una nueva partida para el Jugador.
-	public VOPartida iniciarNuevaPartida(VOJugadorLogin jug) {
+	public VOPartida iniciarNuevaPartida(VOJugadorLogin jug) throws JugadorException {
 		if (logearseParaJugar(jug)) {
 			Jugador player = jugadores.find(jug.getNombre());
 			if (player.isPartidaEnCurso()) {
-				throw new UnsupportedOperationException();
+				throw new JugadorException(5);
 			} else {
 				SecuenciaDePartidas sec = player.getPartidas();
 				int numPar = sec.RetornarNumeroPartidaMasAlta() + 1;
@@ -145,18 +146,18 @@ public class Fachada {
 				return partAMostrar;// Porque se retorna partida??
 			}
 		} else {
-			throw new UnsupportedOperationException();
+			throw new JugadorException(3);
 		}
 
 	}
 
 	// Retorna la partida en curso que el Jugador tiene
-	public VOPartida visualizarPartidaEnCurso(VOJugadorLogin jug) {
+	public VOPartida visualizarPartidaEnCurso(VOJugadorLogin jug) throws JugadorException {
 		if (logearseParaJugar(jug)) {
 			Jugador player = jugadores.find(jug.getNombre());
 			boolean tieneEnCurso = player.isPartidaEnCurso();
 			if (!tieneEnCurso) {
-				throw new UnsupportedOperationException();
+				throw new JugadorException(6);
 			} else {
 				Partida part = player.getPartidas().RetornarUltimaPartida();
 				int numP = part.getNumPartida();
@@ -170,17 +171,17 @@ public class Fachada {
 			}
 
 		} else {
-			throw new UnsupportedOperationException();
+			throw new JugadorException(3);
 		}
 	}
 
 	// Retorna la Partida, verificando si el jugador acerto o no el numero Secreto
-	public VOPartidaEsMayorMenor realizarUnIntento(VOJugadorLogin jug, int posibleNumSecreto) {
+	public VOPartidaEsMayorMenor realizarUnIntento(VOJugadorLogin jug, int posibleNumSecreto) throws JugadorException {
 		if (logearseParaJugar(jug)) {
 			Jugador player = jugadores.find(jug.getNombre());
 			boolean tieneEnCurso = player.isPartidaEnCurso();
 			if (!tieneEnCurso) {
-				throw new UnsupportedOperationException();
+				throw new JugadorException(6);
 			} else {
 				SecuenciaDePartidas sec = player.getPartidas();
 				Partida part = sec.RetornarUltimaPartida();
@@ -221,26 +222,25 @@ public class Fachada {
 
 					}
 
-					
 				}
 				return partAMostrar;
 			}
 		} else {
-			throw new UnsupportedOperationException();
+			throw new JugadorException(3);
 		}
-		
+
 	}
 
 	// Retorna el abandono de la partida en curso del Jugador
-	public VOPartidaEsMayorMenor abandonarPartida(VOJugadorLogin jug) {
+	public VOPartidaEsMayorMenor abandonarPartida(VOJugadorLogin jug) throws JugadorException {
 
 		if (logearseParaJugar(jug)) {
-			throw new UnsupportedOperationException();
+			throw new JugadorException(3);
 		} else {
 			Jugador player = jugadores.find(jug.getNombre());
 			boolean tieneEnCurso = player.isPartidaEnCurso();
 			if (!tieneEnCurso) {
-				throw new UnsupportedOperationException();
+				throw new JugadorException(6);
 			} else {
 				SecuenciaDePartidas sec = player.getPartidas();
 				Partida part = sec.RetornarUltimaPartida();
@@ -270,20 +270,24 @@ public class Fachada {
 
 	// Retorna un ArrayList del Ranking Global de Jugadores, ordenado por su
 	// cociente
-	public ArrayList<VOJugadorRankingGlobal> rankingGlobal() {
+	public ArrayList<VOJugadorRankingGlobal> rankingGlobal() throws JugadorException {
 		boolean vacio = jugadores.empty();
 		Iterator<Jugador> iterator = jugadores.devolverIteradorJugador();
 		ArrayList<VOJugadorRankingGlobal> lista = new ArrayList<VOJugadorRankingGlobal>();
 		int i = 1;
-		while (iterator.hasNext()) {
-			Jugador jugador = iterator.next();
-			String nombre = jugador.getNombre();
-			int puntaje = jugador.getPuntajeTotal();
-			int cantidad = jugador.getCantPartidasFinalizadas();
-			int cociente = jugador.getCociente();
-			VOJugadorRankingGlobal VOJugador = new VOJugadorRankingGlobal(i, nombre, puntaje, cantidad, cociente);
-			lista.add(VOJugador);
-			i++;
+		if (!vacio) {
+			while (iterator.hasNext()) {
+				Jugador jugador = iterator.next();
+				String nombre = jugador.getNombre();
+				int puntaje = jugador.getPuntajeTotal();
+				int cantidad = jugador.getCantPartidasFinalizadas();
+				int cociente = jugador.getCociente();
+				VOJugadorRankingGlobal VOJugador = new VOJugadorRankingGlobal(i, nombre, puntaje, cantidad, cociente);
+				lista.add(VOJugador);
+				i++;
+			}
+		} else {
+			throw new JugadorException(2);
 		}
 		return lista;
 	}

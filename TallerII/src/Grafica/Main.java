@@ -4,12 +4,13 @@ import java.util.ArrayList;
 
 import Logica.Fachada;
 import Logica.Jugador;
+import Logica.JugadorException;
 import ValueObjects.VOJugadorDespliegue;
 import ValueObjects.VOJugadorLogin;
 
 public class Main {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws JugadorException {
 
 		Fachada f = new Fachada();
 		Jugador j1 = new Jugador("Pablo", "aaaaaaa");
