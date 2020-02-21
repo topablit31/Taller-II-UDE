@@ -29,8 +29,8 @@ public class DiccionarioJugadores {
 	}
 
 	public Iterator<Jugador> devolverIteradorJugador() {
-		LinkedList<Jugador> iter = (LinkedList<Jugador>) jugadores.values();
-		return iter.iterator();// Se uso iterator de JAVA
+		Iterator<Jugador> iter = jugadores.values().iterator();
+		return iter;// Se uso iterator de JAVA
 	}
 
 	
