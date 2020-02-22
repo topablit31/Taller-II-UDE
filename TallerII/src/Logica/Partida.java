@@ -1,6 +1,8 @@
 package Logica;
 
-public class Partida 
+import java.io.Serializable;
+
+public class Partida implements Serializable
 {
 
 	private int numPartida;

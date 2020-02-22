@@ -1,5 +1,8 @@
 package Logica;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
 import org.omg.CORBA.portable.ApplicationException;
@@ -15,17 +18,17 @@ import Logica.PartidaException;
 
 /*import ValueObjects.VOJugadorLogin;*/
 
-public class Fachada {
+public class Fachada extends UnicastRemoteObject implements IFachada, Serializable{
 
 	private DiccionarioJugadores jugadores;
 
 	// Constructor
-	public Fachada() {
+	public Fachada() throws RemoteException{
 		jugadores = new DiccionarioJugadores();
 	}
 
 	// Registra un nuevo jugador en el Diccionario
-	public void registrarNuevoJugador(VOJugadorLogin voJugador) throws JugadorException {
+	public void registrarNuevoJugador(VOJugadorLogin voJugador) throws JugadorException,RemoteException {
 		String nombre = voJugador.getNombre();
 		String codigoIngreso = voJugador.getCodIngreso();
 		if (!jugadores.member(nombre)) {
@@ -38,7 +41,7 @@ public class Fachada {
 
 	// Retorna un ArrayList con los Jugadores que estan en el Diccionario, ordenados
 	// alfabeticamente
-	public ArrayList<VOJugadorDespliegue> listarJugadores() throws JugadorException {
+	public ArrayList<VOJugadorDespliegue> listarJugadores() throws JugadorException,RemoteException {
 		boolean vacio = jugadores.empty();
 		ArrayList<VOJugadorDespliegue> jugadoresAMostrar = new ArrayList<VOJugadorDespliegue>();
 		if (vacio) {
@@ -65,7 +68,7 @@ public class Fachada {
 
 	// Retorna un ArrayList con las partidas de un jugador, ordenadas de menor a
 	// mayor numero de Partida
-	public ArrayList<VOPartida> listarPartidasDeUnJugador(String nom) throws JugadorException, PartidaException {
+	public ArrayList<VOPartida> listarPartidasDeUnJugador(String nom) throws JugadorException, PartidaException,RemoteException {
 		// ArrayList<VOJugadorDespliegue> jugadoresAMostrar = new
 		// ArrayList<VOJugadorDespliegue>();
 		ArrayList<VOPartida> partidasAMostrar = new ArrayList<VOPartida>();
@@ -100,12 +103,12 @@ public class Fachada {
 	}
 
 	// Guarda los cambios hechos en el sistema
-	public void guardarCambios() {
+	public void guardarCambios()throws RemoteException {
 
 	}
 
 	// Verifica que el nombre y el codigo de Ingreso sean validos
-	public boolean logearseParaJugar(VOJugadorLogin jug) throws JugadorException {
+	public boolean logearseParaJugar(VOJugadorLogin jug) throws JugadorException,RemoteException {
 		String nom = jug.getNombre();
 		String cod = jug.getCodIngreso();
 		boolean existe = jugadores.member(nom);
@@ -124,7 +127,7 @@ public class Fachada {
 	}
 
 	// Inicia una nueva partida para el Jugador.
-	public VOPartida iniciarNuevaPartida(VOJugadorLogin jug) throws JugadorException {
+	public VOPartida iniciarNuevaPartida(VOJugadorLogin jug) throws JugadorException,RemoteException {
 		if (logearseParaJugar(jug)) {
 			Jugador player = jugadores.find(jug.getNombre());
 			if (player.isPartidaEnCurso()) {
@@ -152,7 +155,7 @@ public class Fachada {
 	}
 
 	// Retorna la partida en curso que el Jugador tiene
-	public VOPartida visualizarPartidaEnCurso(VOJugadorLogin jug) throws JugadorException {
+	public VOPartida visualizarPartidaEnCurso(VOJugadorLogin jug) throws JugadorException,RemoteException {
 		if (logearseParaJugar(jug)) {
 			Jugador player = jugadores.find(jug.getNombre());
 			boolean tieneEnCurso = player.isPartidaEnCurso();
@@ -176,7 +179,7 @@ public class Fachada {
 	}
 
 	// Retorna la Partida, verificando si el jugador acerto o no el numero Secreto
-	public VOPartidaEsMayorMenor realizarUnIntento(VOJugadorLogin jug, int posibleNumSecreto) throws JugadorException {
+	public VOPartidaEsMayorMenor realizarUnIntento(VOJugadorLogin jug, int posibleNumSecreto) throws JugadorException,RemoteException {
 		if (logearseParaJugar(jug)) {
 			Jugador player = jugadores.find(jug.getNombre());
 			boolean tieneEnCurso = player.isPartidaEnCurso();
@@ -232,7 +235,7 @@ public class Fachada {
 	}
 
 	// Retorna el abandono de la partida en curso del Jugador
-	public VOPartidaEsMayorMenor abandonarPartida(VOJugadorLogin jug) throws JugadorException {
+	public VOPartidaEsMayorMenor abandonarPartida(VOJugadorLogin jug) throws JugadorException,RemoteException {
 
 		if (logearseParaJugar(jug)) {
 			throw new JugadorException(3);
@@ -270,7 +273,7 @@ public class Fachada {
 
 	// Retorna un ArrayList del Ranking Global de Jugadores, ordenado por su
 	// cociente
-	public ArrayList<VOJugadorRankingGlobal> rankingGlobal() throws JugadorException {
+	public ArrayList<VOJugadorRankingGlobal> rankingGlobal() throws JugadorException,RemoteException {
 		boolean vacio = jugadores.empty();
 		Iterator<Jugador> iterator = jugadores.devolverIteradorJugador();
 		ArrayList<VOJugadorRankingGlobal> lista = new ArrayList<VOJugadorRankingGlobal>();

@@ -9,6 +9,11 @@ public class PartidaException extends Exception
 	{
 		mensaje = "Secuencia de partidas vacia";
 	}
+
+
+	public String getMensaje() {
+		return mensaje;
+	}
 	
 	
 	

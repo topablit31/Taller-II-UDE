@@ -1,6 +1,8 @@
 package ValueObjects;
 
-public class VOJugadorDespliegue {
+import java.io.Serializable;
+
+public class VOJugadorDespliegue implements Serializable {
 
 	
 	private String nombre;

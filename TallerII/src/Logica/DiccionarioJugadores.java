@@ -1,9 +1,11 @@
 package Logica;
 
 import Logica.Jugador;
+
+import java.io.Serializable;
 import java.util.*;
 
-public class DiccionarioJugadores {
+public class DiccionarioJugadores implements Serializable{
 
 	private TreeMap<String, Jugador> jugadores;
 
@@ -29,6 +31,8 @@ public class DiccionarioJugadores {
 	}
 
 	public Iterator<Jugador> devolverIteradorJugador() {
+		
+		
 		Iterator<Jugador> iter = jugadores.values().iterator();
 		return iter;// Se uso iterator de JAVA
 	}
@@ -36,9 +40,17 @@ public class DiccionarioJugadores {
 	
 	public Iterator<Jugador> devolverIteradorRanking()
 	{
-		LinkedList<Jugador> iter = (LinkedList<Jugador>) jugadores.values();
-		Collections.sort(iter);
-		return iter.iterator();
+		LinkedList<Jugador> lista = new LinkedList<Jugador>() ;
+		Iterator<Jugador> iter = jugadores.values().iterator();
+		while(iter.hasNext())
+		{
+			Jugador jugador=iter.next();
+			lista.add(jugador);
+		}
+		
+		
+		Collections.sort(lista);
+		return lista.iterator();
 	}
 	public int TamañoJugadores() {
 		return jugadores.size();

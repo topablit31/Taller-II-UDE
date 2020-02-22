@@ -1,8 +1,9 @@
 package Logica;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
-public class Jugador implements Comparable<Jugador>
+public class Jugador implements Comparable<Jugador>,Serializable
 {
 	private String nombre;
 	private String codIngreso;

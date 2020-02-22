@@ -1,11 +1,12 @@
 package Logica;
 
 
+import java.io.Serializable;
 import java.util.*;
 
 import ValueObjects.VOPartida;
 
-public class SecuenciaDePartidas
+public class SecuenciaDePartidas implements Serializable
 {
 
 	private LinkedList <Partida> partidas;
