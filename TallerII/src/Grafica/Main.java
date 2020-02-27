@@ -33,6 +33,9 @@ public class Main {
 		} catch (PersistenciaException e) {
 			System.out.println(e.getMensaje());
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 

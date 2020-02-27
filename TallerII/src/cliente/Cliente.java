@@ -27,6 +27,9 @@ public class Cliente {
 			} catch (MalformedURLException | RemoteException | NotBoundException | JugadorException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 			
 		

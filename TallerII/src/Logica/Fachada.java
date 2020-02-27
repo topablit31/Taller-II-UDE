@@ -1,5 +1,6 @@
 package Logica;
 
+
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -16,77 +17,102 @@ import ValueObjects.VOPartidaEsMayorMenor;
 import Logica.JugadorException;
 import Logica.PartidaException;
 
+import Logica.Monitor;
+
 /*import ValueObjects.VOJugadorLogin;*/
 
-public class Fachada extends UnicastRemoteObject implements IFachada, Serializable{
+public class Fachada extends UnicastRemoteObject implements IFachada, Serializable
+{
 
 	private DiccionarioJugadores jugadores;
-
+	private Monitor monitor;
+	
 	// Constructor
 	public Fachada() throws RemoteException{
 		jugadores = new DiccionarioJugadores();
+		monitor=new Monitor();
 	}
 
 	// Registra un nuevo jugador en el Diccionario
-	public void registrarNuevoJugador(VOJugadorLogin voJugador) throws JugadorException,RemoteException {
+	public synchronized void registrarNuevoJugador(VOJugadorLogin voJugador) throws JugadorException,RemoteException, InterruptedException
+	{
+		monitor.comienzoEscritura();
 		String nombre = voJugador.getNombre();
 		String codigoIngreso = voJugador.getCodIngreso();
-		if (!jugadores.member(nombre)) {
+		if (!jugadores.member(nombre))
+		{
 			Jugador jugador = new Jugador(nombre, codigoIngreso);
 			jugadores.insert(nombre, jugador);
-		} else {
+			monitor.terminoEscritura();
+		} 
+		else 
+		{	
+			monitor.terminoEscritura();
 			throw new JugadorException(4);
 		}
 	}
 
 	// Retorna un ArrayList con los Jugadores que estan en el Diccionario, ordenados
 	// alfabeticamente
-	public ArrayList<VOJugadorDespliegue> listarJugadores() throws JugadorException,RemoteException {
+	public synchronized ArrayList<VOJugadorDespliegue> listarJugadores() throws JugadorException, RemoteException, InterruptedException 
+	{	
+		monitor.comienzoLectura();
 		boolean vacio = jugadores.empty();
 		ArrayList<VOJugadorDespliegue> jugadoresAMostrar = new ArrayList<VOJugadorDespliegue>();
-		if (vacio) {
+		if (vacio) 
+		{	
+			monitor.terminoLectura();
 			throw new JugadorException(2);
-		} else {
+		} 
+		else 
+		{
 			Iterator<Jugador> iter = jugadores.devolverIteradorJugador();
-
-			while (iter.hasNext()) {
+			while (iter.hasNext())
+			{
 				Jugador jugador = iter.next();
 				String nom = jugador.getNombre();
-
 				int punt = jugador.getPuntajeTotal();
 				int cantPart = jugador.getCantPartidasFinalizadas();
 				int coc = jugador.getCociente();
-
+				
 				VOJugadorDespliegue jugAMostrar = new VOJugadorDespliegue(nom, punt, cantPart, coc);
 				jugadoresAMostrar.add(jugAMostrar);
 			}
-
+			monitor.terminoLectura();
 			return jugadoresAMostrar;
 		}
-
 	}
 
 	// Retorna un ArrayList con las partidas de un jugador, ordenadas de menor a
 	// mayor numero de Partida
-	public ArrayList<VOPartida> listarPartidasDeUnJugador(String nom) throws JugadorException, PartidaException,RemoteException {
+	public synchronized ArrayList<VOPartida> listarPartidasDeUnJugador(String nom) throws JugadorException, PartidaException,RemoteException, InterruptedException 
+	{
 		// ArrayList<VOJugadorDespliegue> jugadoresAMostrar = new
 		// ArrayList<VOJugadorDespliegue>();
+		monitor.comienzoLectura();
 		ArrayList<VOPartida> partidasAMostrar = new ArrayList<VOPartida>();
 		boolean existe = jugadores.member(nom);
-		if (!existe) {
+		if (!existe) 
+		{	
+			monitor.terminoLectura();
 			throw new JugadorException(3);
-		} else {
+		} 
+		else 
+		{
 			Jugador jug = jugadores.find(nom);
 			SecuenciaDePartidas sec = jug.getPartidas();
-			;
-
 			boolean vacia = sec.esVacia();
-			if (vacia) {
+			if (vacia) 
+			{	
+				monitor.terminoLectura();
 				throw new PartidaException();
-			} else {
+			} 
+			else 
+			{
 				Iterator<Partida> iterator = sec.devolverIteratorPartida();
 				int i = 1;
-				while (iterator.hasNext()) {
+				while (iterator.hasNext()) 
+				{
 					Partida part = iterator.next();
 					int numS = part.getNumSecreto();
 					boolean fin = part.isFinalizada();
@@ -96,72 +122,86 @@ public class Fachada extends UnicastRemoteObject implements IFachada, Serializab
 					partidasAMostrar.add(partAMostrar);
 					i++;
 				}
-
+				monitor.terminoLectura();
 				return partidasAMostrar;
 			}
 		}
 	}
 
 	// Guarda los cambios hechos en el sistema
-	public void guardarCambios()throws RemoteException {
+	public void guardarCambios()throws RemoteException 
+	{
 
 	}
 
 	// Verifica que el nombre y el codigo de Ingreso sean validos
-	public boolean logearseParaJugar(VOJugadorLogin jug) throws JugadorException,RemoteException {
+	public synchronized boolean logearseParaJugar(VOJugadorLogin jug) throws JugadorException,RemoteException, InterruptedException
+	{	
+		monitor.comienzoLectura();
 		String nom = jug.getNombre();
 		String cod = jug.getCodIngreso();
 		boolean existe = jugadores.member(nom);
-		if (!existe) {
+		if (!existe) 
+		{	
+			monitor.terminoLectura();
 			throw new JugadorException(3);
-
-		} else {
+		} 
+		else 
+		{
 			Jugador player = jugadores.find(nom);
 
-			if (!player.validarCodigoIngreso(cod)) {
+			if (!player.validarCodigoIngreso(cod)) 
+			{	
+				monitor.terminoLectura();
 				throw new JugadorException(1);
-			} else {
+			} 
+			else 
+			{	
+				monitor.terminoLectura();
 				return true;
 			}
 		}
 	}
 
 	// Inicia una nueva partida para el Jugador.
-	public VOPartida iniciarNuevaPartida(VOJugadorLogin jug) throws JugadorException,RemoteException {
-		if (logearseParaJugar(jug)) {
+	public synchronized VOPartida iniciarNuevaPartida(VOJugadorLogin jug) throws JugadorException,RemoteException, InterruptedException
+	{	
+			monitor.comienzoEscritura();
 			Jugador player = jugadores.find(jug.getNombre());
-			if (player.isPartidaEnCurso()) {
+			if (player.isPartidaEnCurso()) 
+			{	
+				monitor.terminoEscritura();
 				throw new JugadorException(5);
-			} else {
+			} 
+			else 
+			{
 				SecuenciaDePartidas sec = player.getPartidas();
 				int numPar = sec.RetornarNumeroPartidaMasAlta() + 1;
 				Partida part = new Partida(numPar);
 				sec.InsBack(part);
-
-				// player.setPartidas(sec);Pierdo toda las partidas
-				// jugadores.ActualizarJugador(codPlayer, player); No es necesario porque se
-				// recupera el mismo puntero
 				int numS = part.getNumSecreto();
 				boolean fin = part.isFinalizada();
 				int cantIn = part.getCantIntentos();
 				int punt = part.getPuntajeFinal();
 				VOPartida partAMostrar = new VOPartida(numPar, numS, fin, cantIn, punt);
+				monitor.terminoEscritura();
 				return partAMostrar;// Porque se retorna partida??
 			}
-		} else {
-			throw new JugadorException(3);
-		}
-
 	}
 
 	// Retorna la partida en curso que el Jugador tiene
-	public VOPartida visualizarPartidaEnCurso(VOJugadorLogin jug) throws JugadorException,RemoteException {
-		if (logearseParaJugar(jug)) {
+	public synchronized VOPartida visualizarPartidaEnCurso(VOJugadorLogin jug) throws JugadorException,RemoteException, InterruptedException
+	{	
+			monitor.comienzoLectura();
 			Jugador player = jugadores.find(jug.getNombre());
 			boolean tieneEnCurso = player.isPartidaEnCurso();
-			if (!tieneEnCurso) {
+			if (!tieneEnCurso) 
+			{	
+				monitor.terminoLectura();
 				throw new JugadorException(6);
-			} else {
+			} 
+			else 
+			{
 				Partida part = player.getPartidas().RetornarUltimaPartida();
 				int numP = part.getNumPartida();
 				int numS = part.getNumSecreto();
@@ -170,22 +210,24 @@ public class Fachada extends UnicastRemoteObject implements IFachada, Serializab
 				int punt = part.getPuntajeFinal();
 
 				VOPartida partidaAMostrar = new VOPartida(numP, numS, fin, cantIn, punt);
+				monitor.terminoLectura();
 				return partidaAMostrar;
-			}
-
-		} else {
-			throw new JugadorException(3);
-		}
+			} 
 	}
 
 	// Retorna la Partida, verificando si el jugador acerto o no el numero Secreto
-	public VOPartidaEsMayorMenor realizarUnIntento(VOJugadorLogin jug, int posibleNumSecreto) throws JugadorException,RemoteException {
-		if (logearseParaJugar(jug)) {
+	public synchronized VOPartidaEsMayorMenor realizarUnIntento(VOJugadorLogin jug, int posibleNumSecreto) throws JugadorException,RemoteException, InterruptedException 
+	{	
+			monitor.comienzoEscritura();
 			Jugador player = jugadores.find(jug.getNombre());
 			boolean tieneEnCurso = player.isPartidaEnCurso();
-			if (!tieneEnCurso) {
+			if (!tieneEnCurso) 
+			{	
+				monitor.terminoEscritura();
 				throw new JugadorException(6);
-			} else {
+			} 
+			else 
+			{
 				SecuenciaDePartidas sec = player.getPartidas();
 				Partida part = sec.RetornarUltimaPartida();
 				String message;
@@ -195,26 +237,25 @@ public class Fachada extends UnicastRemoteObject implements IFachada, Serializab
 				int cantInt = part.getCantIntentos();
 				int numS = part.getNumSecreto();
 
-				if (posibleNumSecreto < numS) {
-
+				if (posibleNumSecreto < numS) 
+				{
 					message = "El numero secreto es menor al numero ingresado";
 					partAMostrar = new VOPartidaEsMayorMenor(numP, false, cantInt, 0, message);
-
-				} else {
-					if (posibleNumSecreto > numS) {
-
+					monitor.terminoLectura();
+				} 
+				else 
+				{
+					if (posibleNumSecreto > numS) 
+					{
 						message = "El numero secreto es mayor al numero ingresado";
-
 						partAMostrar = new VOPartidaEsMayorMenor(numP, false, cantInt, 0, message);
-
-					} else {
-
+					} 
+					else 
+					{
 						int puntFinal = (int) Math.ceil(1000 / cantInt);
 						part.setPuntajeFinal(puntFinal);
-
 						message = "El numero es COOOOORRECTOO";
 						partAMostrar = new VOPartidaEsMayorMenor(numP, true, cantInt, puntFinal, message);
-
 						player.SumarUnaPartidaFinalizada();
 						int puntActualJugador = player.getPuntajeTotal() + puntFinal;
 						int cantPartidas = player.getCantPartidasFinalizadas();
@@ -222,29 +263,26 @@ public class Fachada extends UnicastRemoteObject implements IFachada, Serializab
 						player.setPartidaEnCurso(false);
 						player.setPuntajeTotal(puntActualJugador);
 						player.setCociente(nuevoCociente);
-
 					}
-
 				}
+				monitor.terminoEscritura();
 				return partAMostrar;
 			}
-		} else {
-			throw new JugadorException(3);
-		}
-
 	}
 
 	// Retorna el abandono de la partida en curso del Jugador
-	public VOPartidaEsMayorMenor abandonarPartida(VOJugadorLogin jug) throws JugadorException,RemoteException {
-
-		if (logearseParaJugar(jug)) {
-			throw new JugadorException(3);
-		} else {
+	public synchronized VOPartidaEsMayorMenor abandonarPartida(VOJugadorLogin jug) throws JugadorException,RemoteException, InterruptedException
+	{		
+			monitor.comienzoEscritura();
 			Jugador player = jugadores.find(jug.getNombre());
 			boolean tieneEnCurso = player.isPartidaEnCurso();
-			if (!tieneEnCurso) {
+			if (!tieneEnCurso) 
+			{
+				monitor.terminoEscritura();
 				throw new JugadorException(6);
-			} else {
+			} 
+			else 
+			{
 				SecuenciaDePartidas sec = player.getPartidas();
 				Partida part = sec.RetornarUltimaPartida();
 
@@ -265,21 +303,24 @@ public class Fachada extends UnicastRemoteObject implements IFachada, Serializab
 				player.setPuntajeTotal(puntActualJugador);
 				player.setCociente(nuevoCociente);
 
+				monitor.terminoEscritura();
 				return partAMostrar;
 			}
-		}
-
 	}
 
 	// Retorna un ArrayList del Ranking Global de Jugadores, ordenado por su
 	// cociente
-	public ArrayList<VOJugadorRankingGlobal> rankingGlobal() throws JugadorException,RemoteException {
+	public synchronized ArrayList<VOJugadorRankingGlobal> rankingGlobal() throws JugadorException,RemoteException, InterruptedException
+	{	
+		monitor.comienzoLectura();
 		boolean vacio = jugadores.empty();
 		Iterator<Jugador> iterator = jugadores.devolverIteradorJugador();
 		ArrayList<VOJugadorRankingGlobal> lista = new ArrayList<VOJugadorRankingGlobal>();
 		int i = 1;
-		if (!vacio) {
-			while (iterator.hasNext()) {
+		if (!vacio) 
+		{
+			while (iterator.hasNext()) 
+			{
 				Jugador jugador = iterator.next();
 				String nombre = jugador.getNombre();
 				int puntaje = jugador.getPuntajeTotal();
@@ -289,13 +330,14 @@ public class Fachada extends UnicastRemoteObject implements IFachada, Serializab
 				lista.add(VOJugador);
 				i++;
 			}
-		} else {
+		} 
+		else 
+		{	
+			monitor.terminoLectura();
 			throw new JugadorException(2);
 		}
+		monitor.terminoLectura();
 		return lista;
 	}
 
-	// Monitor, clasificar requerimientos lectura ó escritura, si modifica datos
-	// escritura, sino lectura, primer paso iniciar escritura o lectura, último paso
-	// liberar escritura ó lectura
 }
