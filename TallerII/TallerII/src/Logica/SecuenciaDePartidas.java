@@ -48,20 +48,8 @@ public class SecuenciaDePartidas implements Serializable
 			return null; // ver luego, manejo de excepciones, ver todos los null retornados
 	}
 	
-	//Retorna y ELIMINA la ultima partida de la secuencia
-	/*public Partida	RetornarYEliminarUltimaPartidaDeLaLista ()
-	{
-		int cantPartidas = partidas.size();
-		if (cantPartidas > 0)
-		{
-			Partida part = partidas.remove(cantPartidas-1);
-			return part;
-		}
-		else
-		{
-			return null; // Exception
-		}
-	} */
+	
+	
 
 	//Retorna el numero de la ultima partida
 	public int RetornarNumeroPartidaMasAlta()

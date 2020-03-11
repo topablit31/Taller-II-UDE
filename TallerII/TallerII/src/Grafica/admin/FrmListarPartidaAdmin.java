@@ -35,7 +35,6 @@ public class FrmListarPartidaAdmin extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtNombreJugador;
-	private IFachada fachada;
 	private FrmMenuAdmin menu;
 	private JList listPartidas;
 	private ControladoraListarPartidaAdmin controladora;

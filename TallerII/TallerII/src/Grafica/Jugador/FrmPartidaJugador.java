@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import Grafica.controladora.ControladoraPartidaJugador;
 import Logica.IFachada;
 import Logica.JugadorException;
 import ValueObjects.VOJugadorLogin;
@@ -32,50 +33,31 @@ public class FrmPartidaJugador extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField textNumeroIngresado;
-	private IFachada fachada;
 	private VOJugadorLogin credencial;
+
+	private ControladoraPartidaJugador controladora;
+	private JLabel lblNumero;
 	/**
 	 * Create the frame.
 	 */
-	public FrmPartidaJugador(IFachada fachada, VOJugadorLogin credencial) {
+	public FrmPartidaJugador(VOJugadorLogin credencial) {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				int resultado=JOptionPane.showConfirmDialog(null, "Desea abandonar la partida?","Sistema...",JOptionPane.YES_NO_OPTION);
 				if(resultado==JOptionPane.YES_OPTION)
 				{
-					try {
-						fachada.abandonarPartida(credencial);
+						controladora.abandonarPartida(credencial);
 						dispose();
-					} catch (RemoteException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (JugadorException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
 					
 				}
 				
 			}
 		});
-		this.fachada=fachada;
-		this.credencial=credencial;
-		try {
-			fachada.iniciarNuevaPartida(credencial);
-		} catch (RemoteException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} catch (JugadorException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} catch (InterruptedException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
+	
+		controladora=new ControladoraPartidaJugador(this);
+		controladora.iniciarNuevaPartida(credencial);
+		
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 636, 355);
 		contentPane = new JPanel();
@@ -83,7 +65,7 @@ public class FrmPartidaJugador extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JLabel lblNumero = new JLabel("?");
+		lblNumero = new JLabel("?");
 		lblNumero.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNumero.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		lblNumero.setBounds(141, 32, 58, 35);
@@ -114,31 +96,19 @@ public class FrmPartidaJugador extends JFrame {
 		btnIntentar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				try {
+				if(!textNumeroIngresado.getText().trim().equals(""))
+				{
 					int numero=Integer.parseInt(textNumeroIngresado.getText());
-					VOPartidaEsMayorMenor respuesta=fachada.realizarUnIntento(credencial, numero);
-					JOptionPane.showMessageDialog(null, respuesta.getMensaje());
-					VOPartida partida=fachada.visualizarPartidaEnCurso(credencial);
-					if(partida.isVOFinalizada())
-					{
-						JOptionPane.showMessageDialog(null, "Felicitaciones");
-						lblNumeroSecreto.setText(numero+"");
-					}
-				}catch(NumberFormatException ex)
+					
+					controladora.realizarUnIntento(credencial, numero);
+					
+				}
+				else
 				{
 					JOptionPane.showMessageDialog(null, "Se debe ingresar un numero");
-				
-				} catch (RemoteException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (JugadorException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
 				}
-			}
+				
+			} 
 		});
 		btnIntentar.setForeground(new Color(0, 100, 0));
 		btnIntentar.setBounds(461, 175, 89, 23);
@@ -147,26 +117,42 @@ public class FrmPartidaJugador extends JFrame {
 		JButton btnAbandonar = new JButton("Abandonar");
 		btnAbandonar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					fachada.abandonarPartida(credencial);
-					JOptionPane.showMessageDialog(null, "GAME OVER");
-					dispose();
-				} catch (RemoteException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (JugadorException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
 				
-			}
+					controladora.abandonarPartida(credencial);
+					
+			
+				
+			} 
+			
 		});
 		btnAbandonar.setForeground(Color.RED);
 		btnAbandonar.setBounds(461, 230, 89, 23);
-		contentPane.add(btnAbandonar);
+		contentPane.add(btnAbandonar); 
+	}
+	public void mostrarResultado(VOPartidaEsMayorMenor partida) {
+		JOptionPane.showMessageDialog(null, partida.getMensaje());
+		
+		
+		
+	} 
+	
+	
+	public void gano()
+	{
+		
+			JOptionPane.showMessageDialog(null, "Felicitaciones");
+			lblNumero.setText(textNumeroIngresado.getText());
+			dispose();
+		
+	}
+	public void abandonar()
+	{
+		JOptionPane.showMessageDialog(null, "GAME OVER");
+		dispose();
+	}
+	public void errorMensaje(String message) {
+		JOptionPane.showMessageDialog(null, message);
+		
 	}
 
 }

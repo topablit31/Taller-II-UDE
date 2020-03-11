@@ -1,38 +1,40 @@
 package Grafica.admin;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
-import Logica.IFachada;
-import Logica.JugadorException;
-import ValueObjects.VOJugadorDespliegue;
-
-import javax.swing.JLabel;
+import java.awt.Color;
 import java.awt.Font;
-import javax.swing.SwingConstants;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
+import Grafica.controladora.ControladoraListarJugadoresAdmin;
 
 public class FrmListarJugadoresAdmin extends JFrame {
 
 	private JPanel contentPane;
 	
 	private FrmMenuAdmin menu;
+	private FrmListarJugadoresAdmin ventana;
+	private ControladoraListarJugadoresAdmin controladora;
+	private JList list;
+	
 	/**
 	 * Create the frame.
 	 */
 	public FrmListarJugadoresAdmin(FrmMenuAdmin menu) {
+		ventana=this;
+		controladora = new ControladoraListarJugadoresAdmin(ventana);
+		
+		this.menu=menu;
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -41,7 +43,7 @@ public class FrmListarJugadoresAdmin extends JFrame {
 			}
 		});
 		setTitle("LISTAR JUGADORES");
-		this.menu=menu;
+		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 460, 452);
 
@@ -56,10 +58,6 @@ public class FrmListarJugadoresAdmin extends JFrame {
 		lblNewLabel.setBounds(62, 28, 308, 40);
 		contentPane.add(lblNewLabel);
 		
-		JList lstJugadores = new JList();
-		lstJugadores.setBounds(98, 79, 244, 247);
-		contentPane.add(lstJugadores);
-		
 		JButton btnNewButton = new JButton("VOLVER");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -70,20 +68,18 @@ public class FrmListarJugadoresAdmin extends JFrame {
 		btnNewButton.setBounds(345, 369, 89, 33);
 		contentPane.add(btnNewButton);
 		
-		/*
-		try {
-			//ArrayList<VOJugadorDespliegue> jugadores=fachada.listarJugadores();
-			//lstJugadores.setListData(jugadores.toArray());
-			
-		} catch (RemoteException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (JugadorException e1) {
-			JOptionPane.showMessageDialog(this, e1.getMensaje());
-			e1.printStackTrace();
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}*/
+		list = new JList();
+		list.setBounds(80, 127, 316, 192);
+		contentPane.add(list);
+		
+		controladora.listarJugadores();
+	}
+	public void listarJugadores(Object[] jugadores) {
+		
+		
+		
+		list.setListData(jugadores);
+		
+		
 	}
 }

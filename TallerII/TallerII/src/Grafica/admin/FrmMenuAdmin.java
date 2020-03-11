@@ -26,13 +26,12 @@ import java.awt.event.WindowEvent;
 public class FrmMenuAdmin extends JFrame{
 
 	private JPanel contentPane;
-	private IFachada fachada;
-	
 	private ControladoraMenuAdmin controladora;
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				new FrmMenuAdmin().setVisible(true);
+				new FrmMenuAdmin().setVisible(true);;
 			}
 		});
 	}

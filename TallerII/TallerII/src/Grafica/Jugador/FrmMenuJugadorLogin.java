@@ -8,6 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import Grafica.admin.FrmMenuAdmin;
+import Grafica.controladora.ControladoraMenuAdmin;
+import Grafica.controladora.ControladoraMenuJugadorLogin;
 import Logica.IFachada;
 import Logica.JugadorException;
 import ValueObjects.VOJugadorLogin;
@@ -30,7 +32,8 @@ public class FrmMenuJugadorLogin extends JFrame {
 	private JPanel contentPane;
 	private JTextField textUsuario;
 	private JTextField textCodigo;
-	private IFachada fachada;
+	private ControladoraMenuJugadorLogin controladora;
+	
 	
 	/**
 	 * Launch the application.
@@ -38,29 +41,7 @@ public class FrmMenuJugadorLogin extends JFrame {
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				try {
-					IFachada fachada;
-
-					try {
-						
-						fachada = (IFachada) Naming.lookup("//localhost:1099/fachada");
-						FrmMenuJugadorLogin frame = new FrmMenuJugadorLogin(fachada);
-						frame.setVisible(true);
-					} catch (MalformedURLException e) {
-						// TODO Auto-generated catch block
-						JOptionPane.showMessageDialog(null, e.getMessage());
-						e.printStackTrace();
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (NotBoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				new FrmMenuJugadorLogin().setVisible(true);
 			}
 		});
 	}
@@ -68,8 +49,12 @@ public class FrmMenuJugadorLogin extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public FrmMenuJugadorLogin(IFachada fachada) {
-		this.fachada=fachada;
+	public FrmMenuJugadorLogin() {
+		
+		controladora=new ControladoraMenuJugadorLogin(this);
+	
+		
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 501, 266);
 		contentPane = new JPanel();
@@ -100,32 +85,32 @@ public class FrmMenuJugadorLogin extends JFrame {
 		JButton btnLogin = new JButton("Login");
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				login();
+				
+			}
+
+			private void login() {
 				String nombre=textUsuario.getText();
 				String codigo=textCodigo.getText();
 				VOJugadorLogin login=new VOJugadorLogin(nombre, codigo);
-				try {
-					if(fachada.logearseParaJugar(login)) {
-						FrmMenuJugador menu=new FrmMenuJugador(fachada,login);
+				
+				
+					if(controladora.logueoOK(login)) {
+						FrmMenuJugador menu=new FrmMenuJugador(login);
 						menu.setVisible(true);
+						
 					}
 					else {
-						JOptionPane.showMessageDialog(null, "usuario y/o contrasenia equivocada");
+						JOptionPane.showMessageDialog(null, "usuario y/o contraseña equivocada");
+						textUsuario.setText("");
+						textCodigo.setText("");
 					}
-				} catch (RemoteException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (JugadorException e1) {
-					JOptionPane.showMessageDialog(null, e1.getMensaje());
-					e1.printStackTrace();
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				
-			}
+				} 
 		});
 		btnLogin.setBounds(386, 177, 89, 39);
 		contentPane.add(btnLogin);
 	}
+
+
 
 }
